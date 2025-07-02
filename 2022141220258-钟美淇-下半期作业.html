@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C++ Style Guide 分级规范</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+
+        h1 {
+            color: #4285f4;
+            text-align: center;
+            border-bottom: 2px solid #4285f4;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: #333333;
+            border-left: 4px solid #333333;
+            padding-left: 10px;
+            margin-top: 30px;
+        }
+
+         .h3-level-a {
+            color: #d93025;
+        }
+
+        .h3-level-b {
+            color: #1a73e8;
+        }
+
+        .h3-level-c {
+            color: #34a853;
+        }
+
+        .rule-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .rule-level {
+            font-weight: bold;
+            margin-bottom: 10px;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+
+        .level-a {
+            background-color: #fce8e6;
+            color: #d93025;
+            border-left: 4px solid #d93025;
+        }
+
+        .level-b {
+            background-color: #e8f0fe;
+            color: #1a73e8;
+            border-left: 4px solid #1a73e8;
+        }
+
+        .level-c {
+            background-color: #e6f4ea;
+            color: #34a853;
+            border-left: 4px solid #34a853;
+        }
+
+        code {
+            background-color: #f1f3f4;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .summary-table {
+            margin-top: 40px;
+        }
+
+        .toc {
+            background-color: #e8f0fe;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .toc ul {
+            padding-left: 20px;
+        }
+
+        .toc li {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+<h1>C++ Style Guide 分级规范</h1>
+<!--p style="text-align: center;">(强制/推荐/允许三个级别)</p-->
+
+<div class="toc">
+    <h3>目录</h3>
+    <ul>
+        <li><a href="#header">1. 头文件规范</a></li>
+        <li><a href="#naming">2. 命名规范</a></li>
+        <li><a href="#class">3. 类设计</a></li>
+        <li><a href="#function">4. 函数规范</a></li>
+        <li><a href="#modern">5. 现代 C++ 特性</a></li>
+        <li><a href="#format">6. 格式规范</a></li>
+        <li><a href="#exception">7. 异常处理</a></li>
+        <li><a href="#summary">8. 总结</a></li>
+    </ul>
+</div>
+
+<div class="rule-container" id="header">
+    <h2>1. 头文件规范</h2>
+
+    <div class="rule-level level-a">a. 强制</div>
+    <h3 class="h3-level-a">1.1 #define 保护</h3>
+    <p>所有头文件必须使用 <code>#define</code> 防止重复包含：</p>
+    <pre>
+#ifndef PROJECT_PATH_FILE_H_
+#define PROJECT_PATH_FILE_H_
+// ... 头文件内容
+#endif  // PROJECT_PATH_FILE_H_</pre>
+
+    <h3 class="h3-level-a">1.2 避免使用前置声明</h3>
+    <p>除非必要（如循环依赖），否则应直接 <code>#include</code> 所需头文件。</p>
+
+    <h3 class="h3-level-a">1.3 头文件包含顺序</h3>
+    <p>严格按此顺序：</p>
+    <pre>
+// 1. 当前源文件对应的头文件
+#include "foo/bar.h"
+
+// 2. C 系统头文件
+#include &lt;unistd.h&gt;
+
+// 3. C++ 标准库头文件
+#include &lt;vector&gt;
+
+// 4. 其他第三方库头文件
+#include &lt;glog/logging.h&gt;
+
+// 5. 本项目其他头文件
+#include "base/common.h"</pre>
+
+    <div class="rule-level level-b">b. 推荐</div>
+    <h3 class="h3-level-b">1.4 避免在头文件中使用 using namespace</h3>
+    <p>防止命名空间污染。</p>
+
+    <h3 class="h3-level-b">1.5 头文件自包含</h3>
+    <p>确保头文件能独立编译，不依赖其他头文件隐式包含。</p>
+
+    <div class="rule-level level-c">c. 允许</div>
+    <h3 class="h3-level-c">1.6 内联函数</h3>
+    <p>仅适用于短小且频繁调用的函数（如 getter/setter）。</p>
+</div>
+
+<div class="rule-container" id="naming">
+    <h2>2. 命名规范</h2>
+
+    <div class="rule-level level-a">a. 强制</div>
+    <ul>
+        <li><strong>变量名</strong>：小写 + 下划线，如 <code>my_variable</code></li>
+        <li><strong>函数名</strong>：大驼峰，如 <code>ComputeHash()</code></li>
+        <li><strong>类名</strong>：大驼峰，如 <code>MyClass</code></li>
+        <li><strong>常量名</strong>：<code>k</code> + 大驼峰，如 <code>kMaxSize</code></li>
+        <li><strong>宏名</strong>：全大写 + 下划线，如 <code>MY_MACRO</code></li>
+    </ul>
+
+    <div class="rule-level level-b">b. 推荐</div>
+    <ul>
+        <li><strong>枚举值</strong>：大驼峰，如 <code>EnumName::kValue</code></li>
+        <li><strong>命名空间</strong>：全小写，如 <code>google::protobuf</code></li>
+    </ul>
+
+    <div class="rule-level level-c">c. 允许</div>
+    <ul>
+        <li><strong>局部变量短命名</strong>：如 <code>i</code>, <code>j</code> 用于循环变量</li>
+    </ul>
+</div>
+
+<div class="rule-container" id="class">
+    <h2>3. 类设计</h2>
+
+    <div class="rule-level level-a">a. 强制</div>
+    <h3 class="h3-level-a">3.1 单参数构造函数必须 explicit</h3>
+    <p>防止隐式转换：</p>
+    <pre>explicit Foo(int x);  // 禁止 Foo f = 42;</pre>
+
+    <h3 class="h3-level-a">3.2 禁用默认拷贝/赋值（如需禁用，用 = delete）</h3>
+    <pre>MyClass(const MyClass&) = delete;
+MyClass& operator=(const MyClass&) = delete;</pre>
+
+    <div class="rule-level level-b">b. 推荐</div>
+    <h3 class="h3-level-b">3.3 优先使用组合而非继承</h3>
+    <p>除非是 "is-a" 关系，否则避免继承。</p>
+
+    <h3 class="h3-level-b">3.4 类成员变量私有化</h3>
+    <p>除非是 <code>struct</code>（纯数据聚合）。</p>
+
+    <div class="rule-level level-c">c. 允许</div>
+    <h3 class="h3-level-c">3.5 struct 用于纯数据类</h3>
+    <p>无成员函数时使用。</p>
+</div>
+
+<div class="rule-container" id="function">
+    <h2>4. 函数规范</h2>
+
+    <div class="rule-level level-a">a. 强制</div>
+    <h3 class="h3-level-a">4.1 参数传递规则</h3>
+    <ul>
+        <li>输入参数用 <code>const T&</code> 或值传递</li>
+        <li>输出参数用指针</li>
+    </ul>
+    <pre>void Compute(const std::string& input, int* output);</pre>
+
+    <h3 class="h3-level-a">4.2 禁止函数重载，除非语义完全相同</h3>
+    <p>避免混淆。</p>
+
+    <div class="rule-level level-b">b. 推荐</div>
+    <h3 class="h3-level-b">4.3 函数长度不超过 40 行</h3>
+    <p>过长应拆分。</p>
+
+    <h3 class="h3-level-b">4.4 优先返回 StatusOr&lt;T&gt; 或 absl::Status 而非 bool</h3>
+    <p>提供更清晰的错误处理。</p>
+
+    <div class="rule-level level-c">c. 允许</div>
+    <h3 class="h3-level-c">4.5 默认参数</h3>
+    <p>慎用，避免接口模糊。</p>
+</div>
+
+<div class="rule-container" id="modern">
+    <h2>5. 现代 C++ 特性</h2>
+
+    <div class="rule-level level-a">a. 强制</div>
+    <h3 class="h3-level-a">5.1 智能指针</h3>
+    <ul>
+        <li>优先 <code>std::unique_ptr</code></li>
+        <li>仅共享所有权时用 <code>std::shared_ptr</code></li>
+        <li>禁止 <code>auto_ptr</code>（已废弃）</li>
+    </ul>
+
+    <h3 class="h3-level-a">5.2 禁用 std::bind，改用 lambda</h3>
+    <pre>auto callback = [&] { DoSomething(); };  // 推荐</pre>
+
+    <div class="rule-level level-b">b. 推荐</div>
+    <h3 class="h3-level-b">5.3 constexpr 用于编译期计算</h3>
+    <pre>constexpr int kMaxSize = 100;</pre>
+
+    <h3 class="h3-level-b">5.4 noexcept 标记不抛异常的函数</h3>
+    <pre>void Shutdown() noexcept;</pre>
+
+    <div class="rule-level level-c">c. 允许</div>
+    <h3 class="h3-level-c">5.5 std::optional 替代 nullptr 或 bool + 输出参数</h3>
+</div>
+
+<div class="rule-container" id="format">
+    <h2>6. 格式规范</h2>
+
+    <div class="rule-level level-a">a. 强制</div>
+    <h3 class="h3-level-a">6.1 缩进</h3>
+    <p>使用 2 个空格（非 Tab）。</p>
+
+    <h3 class="h3-level-a">6.2 行宽</h3>
+    <p>最大 80 字符（特殊情况可放宽至 100）。</p>
+
+    <h3 class="h3-level-a">6.3 大括号换行</h3>
+    <pre>if (condition) {
+  DoSomething();
+}</pre>
+
+    <div class="rule-level level-b">b. 推荐</div>
+    <h3 class="h3-level-b">6.4 if / for 后加空格</h3>
+    <pre>for (int i = 0; i < n; ++i) {  // 推荐
+        for(int i=0;i < n;++i){          // 不推荐
+    </pre>
+
+    <div class="rule-level level-c">c. 允许</div>
+    <h3 class="h3-level-c">6.5 链式调用换行</h3>
+    <pre>object.DoSomething()
+      .DoAnotherThing()
+      .Finalize();</pre>
+</div>
+
+<div class="rule-container" id="exception">
+    <h2>7. 异常处理</h2>
+
+    <div class="rule-level level-a">a. 强制</div>
+    <h3 class="h3-level-a">7.1 禁止用异常做控制流</h3>
+    <p>（Google 内部禁用异常，但外部项目可放宽）。</p>
+
+    <div class="rule-level level-b">b. 推荐</div>
+    <h3 class="h3-level-b">7.2 构造函数失败应抛异常</h3>
+    <p>而非返回错误码。</p>
+
+    <div class="rule-level level-c">c. 允许</div>
+    <h3 class="h3-level-c">7.3 noexcept 标记不抛异常的函数</h3>
+</div>
+
+<div class="rule-container summary-table" id="summary">
+    <h2>8. 总结</h2>
+    <table>
+        <tr>
+            <th>级别</th>
+            <th>含义</th>
+            <th>示例</th>
+        </tr>
+        <tr>
+            <td><strong>a. 强制</strong></td>
+            <td>必须遵守，否则代码无法合入</td>
+            <td><code>#define</code> 保护、<code>explicit</code> 构造函数</td>
+        </tr>
+        <tr>
+            <td><strong>b. 推荐</strong></td>
+            <td>建议遵守，提高代码质量</td>
+            <td>避免 <code>using namespace</code>、优先 <code>constexpr</code></td>
+        </tr>
+        <tr>
+            <td><strong>c. 允许</strong></td>
+            <td>特殊情况可用</td>
+            <td>默认参数、<code>std::optional</code></td>
+        </tr>
+    </table>
+    <p style="text-align: center; margin-top: 20px;">
+        规范参考：<a href="https://google.github.io/styleguide/cppguide.html" target="_blank">Google C++ Style
+        Guide</a>
+    </p>
+</div>
+</body>
+</html>
